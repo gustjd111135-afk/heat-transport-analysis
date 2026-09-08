@@ -19,7 +19,11 @@
 │   └── 3_cluster_and_map.py # K-means 군집 + 전국 지도 + 탄소 시나리오
 ├── data/                  # 입력 데이터(공개 자료)
 │   ├── elderly.csv        # 행안부 지역별 연령별 인구 (data.go.kr/data/15097972)
-│   └── kma_asos.csv       # 기상청 ASOS 일 최고기온 2026.6.1~9.1 (data.kma.go.kr)
+│   └── kma/               # 기상청 ASOS 일 최고기온 (연도별)
+│       ├── asos_2024.csv   #   2024 여름 (data.kma.go.kr)
+│       ├── asos_2025.csv   #   2025 여름
+│       └── asos_2026.csv   #   2026 여름
+ (data.kma.go.kr)
 └── out/
     ├── bus_service.csv     # TAGO 수집 결과(포함) — 2·3단계 즉시 실행 가능
     └── risk_index.csv      # 최종 위험 지수·순위(재현 결과)
@@ -46,12 +50,12 @@ python src/3_cluster_and_map.py
 |---|---|---|
 | 버스 노선/정류소 | 국토교통부(TAGO) | data.go.kr/data/15098529 |
 | 연령별 인구 | 행정안전부 | data.go.kr/data/15097972 |
-| 일 최고기온(ASOS) | 기상청 | data.kma.go.kr |
+| 일 최고기온(ASOS, 3개년) | 기상청 | data.kma.go.kr |
 | 시군구/읍면동 경계 | 오픈 GeoJSON | southkorea-maps, vuski/admdongkor |
 
 > 지도 라벨의 한글 표시를 위해 NanumGothic 등 한글 폰트 설치를 권장합니다(미설치 시에도 CSV 결과는 동일하게 재현됩니다).
 
 ## 한계
-- 폭염일수는 2026.6.1~9.1 자료(다년 평균으로 확장 가능).
+- 폭염일수는 2024~2026 3개년 평균(다년 평균으로 확장 가능).
 - 배차간격 공식값의 불완전성으로 노선 구조를 대리지표로 사용(방향성 확인, 상관은 약함).
 - 본 지수는 이동 포기를 직접 관측한 것이 아니라 위험 지역을 선별하는 스크리닝 도구.

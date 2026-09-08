@@ -26,12 +26,21 @@ def load_elderly():
     return g
 
 def load_heat():
-    w = pd.read_csv(f"{config.DATA_DIR}/kma_asos.csv", sep="\t", encoding="cp949")
-    w.columns = ["지점", "지점명", "일시", "tmax"][:len(w.columns)]
-    w["tmax"] = pd.to_numeric(w["tmax"], errors="coerce")
-    heat = {base(n): int(c) for n, c in w[w["tmax"] >= config.HEATWAVE_TEMP].groupby("지점명").size().items()}
-    for n in w["지점명"].unique():
-        heat.setdefault(base(n), 0)
+    """3개년(2024~2026) 여름 폭염일수의 관측소별 평균. 공정 비교 위해 각 연도 6.1~9.1 공통구간 사용."""
+    import glob
+    yearly = []
+    for path in sorted(glob.glob(f"{config.DATA_DIR}/kma/asos_*.csv")):
+        w = pd.read_csv(path, sep="\t", encoding="cp949")
+        w.columns = ["지점", "지점명", "일시", "tmax"][:len(w.columns)]
+        w["일시"] = pd.to_datetime(w["일시"])
+        w["tmax"] = pd.to_numeric(w["tmax"], errors="coerce")
+        cut = pd.Timestamp(w["일시"].dt.year.iloc[0], 9, 1)   # 공통구간 상한 9.1
+        w = w[w["일시"] <= cut]
+        s = w[w["tmax"] >= config.HEATWAVE_TEMP].groupby("지점명").size()
+        yearly.append(s.rename(path))
+    df = pd.concat(yearly, axis=1).fillna(0)
+    avg = df.mean(axis=1)   # 3개년 평균
+    heat = {base(n): float(v) for n, v in avg.items()}
     return heat
 
 def main():
